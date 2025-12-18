@@ -1,4 +1,4 @@
-# Let's Make A Deal! - Simple Game   
+# Let's Make A Deal! - Simple Browser Game   
 
 A minimal browser-based implementation of the classic
 "Let's Make a Deal! gameshow.  
