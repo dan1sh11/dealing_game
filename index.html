@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link href="styles.css" rel="stylesheet">
+        <title>Let's Make a Deal</title>
+    </head>
+
+<body>
+
+    <header><h1>Let's Make a Deal!</h1></header>
+    <p>Pick a door (1, 2, or 3). You can also press keys 1, 2, or 3.</p>
+
+    <div id="doors">
+        <div class="door" data-id="0">Door 1</div>
+        <div class="door" data-id="1">Door 2</div>
+        <div class="door" data-id="2">Door 3</div>
+    </div>
+
+    <div id="msg"></div>
+    <div id="actions"></div>
+    <div id="replay"></div>
+
+    <script>
+        var prizes = [
+            Math.floor(Math.random()*900)+100,
+            Math.floor(Math.random()*900)+100,
+            Math.floor(Math.random()*900)+100
+        ];
+
+        var picked = null;
+        var offer = null;
+        var acceptedOffer = false;
+
+        function pickDoor(id) {
+            if (picked !== null) return;
+            picked = id;
+            document.getElementById("msg").innerText = `You picked Door ${id+1}!`;
+            makeOffer();
+        }
+
+        function makeOffer() {
+            const chosenValue = prizes[picked];
+
+            // Lowball 70%, Highball 30%
+            const lowball = Math.random() < 0.7; 
+            offer = lowball ? 
+                Math.floor(chosenValue * (Math.random()*0.4 + 0.1)) : 
+                Math.floor(chosenValue * (Math.random()*0.8 + 1.0));
+
+            document.getElementById("actions").innerHTML = `
+                <p>The host offers you: <strong>$${offer}</strong></p>
+                <button onclick="takeOffer()">Take the offer</button>
+                <button onclick="rejectOffer()">Reject & Reveal</button>
+            `;
+        }
+
+        function takeOffer() {
+            acceptedOffer = true;
+            reveal();
+        }
+
+        function rejectOffer() {
+            reveal();
+        }
+
+        function reveal() {
+            document.getElementById("actions").innerHTML = "";
+            var msg = "";
+
+            if (acceptedOffer) {
+                msg += `You took the offer: $${offer}<br><br>`;
+                msg += `Your original door had: $${prizes[picked]}<br>`;
+            } else {
+                msg += `You rejected the offer!<br><br>`;
+                msg += `Your door: $${prizes[picked]}<br>`;
+                msg += `You were offered: $${offer}<br>`;
+            }
+
+            msg += `<br>Other doors:<br>`;
+            prizes.forEach((p,i)=>{
+                if (i !== picked) msg += `Door ${i+1}: $${p}<br>`;
+            });
+
+            document.getElementById("msg").innerHTML = msg;
+
+            document.getElementById("replay").innerHTML = `
+            <button id='repl' onclick=replay()>Replay</button>`;
+        }
+
+        function replay(){
+            document.getElementById("replay").addEventListener("click", () => {
+                window.location.reload();
+            });
+        }
+        document.querySelectorAll(".door").forEach(d => {
+            d.addEventListener("click", () => pickDoor(Number(d.dataset.id)));
+        });
+
+   
+        document.addEventListener("keydown", e => {
+            if (["1","2","3"].includes(e.key) && picked === null) {
+                pickDoor(Number(e.key)-1);
+            }
+        });
+    </script>
+
+</body>
+</html>
